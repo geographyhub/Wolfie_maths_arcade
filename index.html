@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Wolfie's Maths Arcade</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --space:#1a1040; --space2:#2a1a5e; --magenta:#ff3e9a; --gold:#ffd23f;
+  --cyan:#22d3ee; --lime:#4ade80; --coral:#fb7185; --violet:#a78bfa;
+  --ink:#1a1040; --paper:#fff;
+  --shadow:0 8px 0 rgba(0,0,0,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Nunito',system-ui,sans-serif;
+  background:
+    radial-gradient(circle at 15% 12%, rgba(255,62,154,.22), transparent 42%),
+    radial-gradient(circle at 85% 8%, rgba(34,211,238,.20), transparent 40%),
+    radial-gradient(circle at 50% 120%, rgba(167,139,250,.30), transparent 55%),
+    linear-gradient(160deg,#1a1040,#2a1a5e 60%,#1a1040);
+  background-attachment:fixed;
+  color:var(--paper); min-height:100dvh; overflow-x:hidden;
+  display:flex; justify-content:center;
+}
+#app{width:100%;max-width:520px;padding:16px 16px 40px;position:relative;z-index:2}
+.hide{display:none!important}
+h1,h2,h3,.display{font-family:'Fredoka',sans-serif}
+
+/* ---- top bar ---- */
+.topbar{display:flex;gap:8px;align-items:center;margin-bottom:14px}
+.pill{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.10);
+  border:2px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 12px;
+  font-weight:800;font-size:15px;backdrop-filter:blur(6px)}
+.pill .big{font-family:'Fredoka';font-size:17px;line-height:1}
+.pill.gold{color:var(--gold)} .pill.flame{color:#ff8a3d}
+.spacer{flex:1}
+
+/* ---- hero ---- */
+.hero{background:linear-gradient(150deg,rgba(255,62,154,.16),rgba(34,211,238,.10));
+  border:2px solid rgba(255,255,255,.14);border-radius:26px;padding:20px;margin-bottom:16px;
+  position:relative;overflow:hidden}
+.hero h1{font-size:30px;line-height:1.05;letter-spacing:.3px}
+.hero .sub{opacity:.85;font-weight:700;margin-top:4px;font-size:14px}
+.quote{margin-top:14px;background:rgba(0,0,0,.22);border-radius:16px;padding:12px 14px;
+  font-weight:700;font-size:14px;border-left:4px solid var(--gold)}
+.quote span{color:var(--gold)}
+
+/* ---- mission ring ---- */
+.mission{display:flex;align-items:center;gap:16px;margin-top:16px}
+.ring{--p:0;width:92px;height:92px;border-radius:50%;flex:none;position:relative;
+  background:conic-gradient(var(--lime) calc(var(--p)*1%), rgba(255,255,255,.12) 0);
+  display:grid;place-items:center}
+.ring::before{content:"";position:absolute;inset:8px;border-radius:50%;background:var(--space2)}
+.ring .val{position:relative;font-family:'Fredoka';font-size:22px}
+.ring .lbl{position:relative;font-size:10px;opacity:.8;font-weight:800;margin-top:-2px}
+.mission .txt{flex:1}
+.mission .txt b{font-family:'Fredoka';font-size:18px}
+.mission .txt p{font-size:13px;opacity:.85;font-weight:700;margin-top:2px}
+
+/* ---- buttons ---- */
+.btn{border:none;font-family:'Fredoka';font-weight:600;cursor:pointer;
+  border-radius:18px;padding:16px;font-size:19px;width:100%;color:#fff;
+  box-shadow:var(--shadow);transition:transform .08s, filter .1s;letter-spacing:.3px}
+.btn:active{transform:translateY(3px);box-shadow:0 5px 0 rgba(0,0,0,.18)}
+.btn.play{background:linear-gradient(180deg,#ff5aa8,#ff2e8f);margin-top:16px}
+.btn.play.done{background:linear-gradient(180deg,#5ee08a,#38c96f)}
+.btn.ghost{background:rgba(255,255,255,.12);box-shadow:0 6px 0 rgba(0,0,0,.14);font-size:16px;padding:13px}
+.btn.small{width:auto;padding:12px 18px;font-size:16px}
+
+/* ---- skill grid ---- */
+.section-t{font-family:'Fredoka';font-size:16px;margin:22px 4px 10px;opacity:.9;
+  display:flex;align-items:center;gap:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{border:none;cursor:pointer;border-radius:20px;padding:15px;text-align:left;
+  color:#fff;box-shadow:var(--shadow);transition:transform .08s;position:relative;overflow:hidden}
+.tile:active{transform:translateY(3px)}
+.tile .emo{font-size:30px;display:block}
+.tile .nm{font-family:'Fredoka';font-size:16px;margin-top:6px;line-height:1.1}
+.tile .best{font-size:11.5px;font-weight:800;opacity:.9;margin-top:4px}
+.tile .weak{position:absolute;top:9px;right:9px;background:#fff;color:#e11d48;
+  font-size:10px;font-weight:900;border-radius:999px;padding:3px 7px}
+.t-times{background:linear-gradient(160deg,#ff6b9d,#e83f7f)}
+.t-mental{background:linear-gradient(160deg,#38bdf8,#0e8fd6)}
+.t-angles{background:linear-gradient(160deg,#a78bfa,#7c5cf0)}
+.t-seq{background:linear-gradient(160deg,#34d399,#0ea371)}
+.t-fdp{background:linear-gradient(160deg,#fbbf24,#f59e0b)}
+.t-neg{background:linear-gradient(160deg,#2dd4bf,#0e7490)}
+.t-bidmas{background:linear-gradient(160deg,#fb923c,#ea580c)}
+.t-algebra{background:linear-gradient(160deg,#c084fc,#7c3aed)}
+.tile.locked{filter:grayscale(.4);opacity:.72;cursor:default}
+.tile .lock{position:absolute;top:9px;right:9px;background:rgba(0,0,0,.35);
+  font-size:10px;font-weight:900;border-radius:999px;padding:3px 8px}
+.tile .lockbar{height:7px;background:rgba(0,0,0,.28);border-radius:999px;margin-top:8px;overflow:hidden}
+.tile .lockbar i{display:block;height:100%;background:var(--gold)}
+.mini{display:flex;gap:10px;margin-top:12px}
+.mini .btn{padding:13px;font-size:15px}
+
+/* ---- game screen ---- */
+.gamehead{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.xbtn{background:rgba(255,255,255,.12);border:none;color:#fff;width:40px;height:40px;
+  border-radius:12px;font-size:20px;font-family:'Fredoka';cursor:pointer;flex:none}
+.progbar{flex:1;height:14px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+.progbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--cyan),var(--lime));
+  transition:width .3s}
+.qcount{font-family:'Fredoka';font-size:15px;flex:none;min-width:44px;text-align:right}
+
+.scorerow{display:flex;gap:10px;margin-bottom:14px}
+.scorecard{flex:1;background:rgba(255,255,255,.09);border:2px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:9px;text-align:center}
+.scorecard .n{font-family:'Fredoka';font-size:22px;line-height:1}
+.scorecard .l{font-size:10px;font-weight:800;opacity:.75;margin-top:3px;text-transform:uppercase;letter-spacing:.4px}
+.scorecard.combo .n{color:var(--gold)}
+.scorecard.best .n{color:var(--cyan)}
+
+.qcard{background:linear-gradient(160deg,#fff,#f2ecff);color:var(--ink);border-radius:26px;
+  padding:26px 20px;text-align:center;box-shadow:var(--shadow);position:relative;min-height:150px;
+  display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.qcard .tag{position:absolute;top:12px;left:14px;font-size:11px;font-weight:900;
+  color:#7c5cf0;text-transform:uppercase;letter-spacing:.6px}
+.qcard .timer{position:absolute;top:12px;right:14px;font-family:'Fredoka';font-size:14px;color:#94a3b8}
+.qcard .q{font-family:'Fredoka';font-size:38px;line-height:1.1;color:var(--ink)}
+.qcard .qsub{font-size:14px;font-weight:800;color:#64748b;margin-top:8px}
+.qcard.flash-ok{animation:okflash .5s}
+.qcard.flash-no{animation:noflash .5s}
+@keyframes okflash{0%{background:#dcfce7}100%{background:#fff}}
+@keyframes noflash{0%,60%{background:#ffe4e6}100%{background:#fff}}
+
+.answer{margin-top:14px}
+.ansbox{width:100%;background:rgba(255,255,255,.10);border:3px solid rgba(255,255,255,.18);
+  border-radius:18px;color:#fff;font-family:'Fredoka';font-size:30px;text-align:center;
+  padding:14px;min-height:62px;letter-spacing:1px}
+.ansbox.ok{border-color:var(--lime);background:rgba(74,222,128,.18)}
+.ansbox.no{border-color:var(--coral);background:rgba(251,113,133,.18)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.key{border:none;background:rgba(255,255,255,.12);color:#fff;font-family:'Fredoka';
+  font-size:24px;padding:15px 0;border-radius:14px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.16)}
+.key:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.16)}
+.key.wide{grid-column:span 1}
+.key.go{background:linear-gradient(180deg,#5ee08a,#38c96f);color:#0b3d20}
+.key.del{background:rgba(251,113,133,.28)}
+.feedback{text-align:center;font-family:'Fredoka';font-size:18px;margin-top:12px;min-height:26px}
+.feedback.ok{color:var(--lime)} .feedback.no{color:var(--coral)}
+
+/* ---- coin burst ---- */
+.burst{position:fixed;pointer-events:none;z-index:50;font-size:26px;animation:fly 1s ease-out forwards}
+@keyframes fly{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-80px) scale(1.5)}}
+
+/* ---- results ---- */
+.results{text-align:center}
+.results .crown{font-size:60px;animation:pop .5s}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+.results h2{font-size:30px;margin-top:6px}
+.newbest{display:inline-block;background:var(--gold);color:#5a3d00;font-family:'Fredoka';
+  padding:6px 16px;border-radius:999px;font-size:16px;margin-top:8px;animation:wob 1s infinite}
+@keyframes wob{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.rstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:18px 0}
+.rstat{background:rgba(255,255,255,.09);border:2px solid rgba(255,255,255,.12);border-radius:16px;padding:12px}
+.rstat .n{font-family:'Fredoka';font-size:24px}
+.rstat .l{font-size:11px;font-weight:800;opacity:.75;margin-top:2px}
+.coach{background:rgba(0,0,0,.22);border-radius:18px;padding:16px;text-align:left;margin-bottom:14px;
+  border-left:4px solid var(--cyan)}
+.coach h3{font-size:16px;color:var(--cyan);margin-bottom:6px}
+.coach p{font-size:14px;font-weight:700;opacity:.92;margin-bottom:5px}
+.coach .warn{color:var(--gold)}
+.stickerwin{background:linear-gradient(160deg,rgba(255,210,63,.2),rgba(255,62,154,.12));
+  border:2px solid var(--gold);border-radius:18px;padding:14px;margin-bottom:14px}
+.stickerwin .row{display:flex;gap:10px;justify-content:center;font-size:34px;margin-top:6px}
+
+/* ---- sticker book / stats ---- */
+.book{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:6px}
+.st{aspect-ratio:1;border-radius:18px;display:grid;place-items:center;font-size:32px;position:relative;
+  background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12)}
+.st.have{background:linear-gradient(160deg,rgba(255,210,63,.25),rgba(167,139,250,.18));
+  border-color:var(--gold)}
+.st.locked{filter:grayscale(1);opacity:.35}
+.st .nm{position:absolute;bottom:5px;font-size:8.5px;font-weight:900;opacity:.85;text-align:center;width:100%}
+.days{margin-top:8px}
+.dayrow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);
+  border-radius:14px;padding:11px 14px;margin-bottom:9px}
+.dayrow .d{font-family:'Fredoka';font-size:14px;min-width:64px}
+.dayrow .bar{flex:1;height:12px;background:rgba(255,255,255,.1);border-radius:999px;overflow:hidden}
+.dayrow .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--magenta),var(--gold))}
+.dayrow .v{font-family:'Fredoka';font-size:14px;color:var(--gold);min-width:52px;text-align:right}
+.backrow{margin-top:20px}
+.empty{opacity:.7;font-weight:700;text-align:center;padding:30px 10px}
+.wk{display:flex;justify-content:space-between;background:rgba(255,255,255,.07);
+  border-radius:12px;padding:10px 14px;margin-bottom:8px;font-weight:800;font-size:14px}
+.wk b{font-family:'Fredoka'}
+.wk .acc{color:var(--lime)} .wk .acc.low{color:var(--coral)}
+
+footer{text-align:center;opacity:.5;font-size:12px;font-weight:700;margin-top:26px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <div id="home">
+    <div class="topbar">
+      <div class="pill flame"><span>🔥</span><span class="big" id="streakN">0</span></div>
+      <div class="pill gold"><span>🪙</span><span class="big" id="goldN">0</span></div>
+      <div class="spacer"></div>
+      <div class="pill" id="dayPill"><span>📅</span><span class="big" id="dayN">1</span></div>
+    </div>
+
+    <div class="hero">
+      <h1 id="greet">Hey Wolfie! 👋</h1>
+      <div class="sub" id="greetSub">Ready to level up your maths brain?</div>
+      <div class="quote" id="quote"></div>
+      <div class="mission">
+        <div class="ring" id="ring"><span class="val" id="ringV">0%</span><span class="lbl">MISSION</span></div>
+        <div class="txt">
+          <b id="missionTitle">Today's Mission</b>
+          <p id="missionP">20 questions. Beat them and keep your streak alive.</p>
+        </div>
+      </div>
+      <button class="btn play" id="startMission">▶ Start Today's Mission</button>
+    </div>
+
+    <div class="section-t">🎮 Free Play — unlock new skills as you go</div>
+    <div class="grid" id="skillGrid"></div>
+
+    <div class="mini">
+      <button class="btn ghost" id="openBook">🏆 Sticker Book</button>
+      <button class="btn ghost" id="openStats">📊 My Progress</button>
+    </div>
+    <footer>Made for Wolfie • practice a little every day 💪</footer>
+  </div>
+
+  <!-- GAME -->
+  <div id="game" class="hide">
+    <div class="gamehead">
+      <button class="xbtn" id="quitGame">✕</button>
+      <div class="progbar"><i id="prog"></i></div>
+      <div class="qcount" id="qcount">1/10</div>
+    </div>
+    <div class="scorerow">
+      <div class="scorecard"><div class="n" id="sScore">0</div><div class="l">Score</div></div>
+      <div class="scorecard combo"><div class="n" id="sCombo">x1</div><div class="l">Combo</div></div>
+      <div class="scorecard best"><div class="n" id="sBest">0</div><div class="l">Best</div></div>
+    </div>
+    <div class="qcard" id="qcard">
+      <div class="tag" id="qtag">Times Tables</div>
+      <div class="timer" id="qtimer">0.0s</div>
+      <div class="q" id="qtext">7 × 8</div>
+      <div class="qsub" id="qsub"></div>
+    </div>
+    <div class="answer">
+      <div class="ansbox" id="ansbox">&nbsp;</div>
+      <div class="pad" id="pad"></div>
+    </div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results" class="hide results">
+    <div class="crown" id="rCrown">🎉</div>
+    <h2 id="rTitle">Great work!</h2>
+    <div id="rBest"></div>
+    <div class="rstats">
+      <div class="rstat"><div class="n" id="rScore">0</div><div class="l">SCORE</div></div>
+      <div class="rstat"><div class="n" id="rAcc">0%</div><div class="l">ACCURACY</div></div>
+      <div class="rstat"><div class="n" id="rGold">0</div><div class="l">GOLD</div></div>
+    </div>
+    <div class="stickerwin hide" id="rUnlock"></div>
+    <div class="stickerwin hide" id="rSticker">
+      <b>✨ New sticker unlocked!</b>
+      <div class="row" id="rStickerRow"></div>
+    </div>
+    <div class="coach" id="rCoach"></div>
+    <button class="btn play" id="rAgain">🔁 Play Again</button>
+    <button class="btn ghost" id="rHome" style="margin-top:10px">🏠 Home</button>
+  </div>
+
+  <!-- STICKER BOOK -->
+  <div id="book" class="hide">
+    <div class="section-t" style="font-size:24px;margin-top:6px">🏆 Sticker Book</div>
+    <p style="opacity:.85;font-weight:700;font-size:13px;margin:0 4px 12px" id="bookCount"></p>
+    <div class="book" id="bookGrid"></div>
+    <div class="backrow"><button class="btn ghost" id="bookBack">← Back</button></div>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats" class="hide">
+    <div class="section-t" style="font-size:24px;margin-top:6px">📊 My Progress</div>
+    <div id="statsBody"></div>
+    <div class="backrow"><button class="btn ghost" id="statsBack">← Back</button></div>
+  </div>
+
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Wolfie's Maths Arcade — adaptive practice engine
+   Single file. Saves to this device (localStorage).
+   ============================================================ */
+
+const SKILLS = {
+  times:  {name:"Times Tables", emoji:"✖️", cls:"t-times",  unlock:0},
+  mental: {name:"Mental Maths", emoji:"⚡", cls:"t-mental", unlock:0},
+  angles: {name:"Angles",       emoji:"📐", cls:"t-angles", unlock:0},
+  seq:    {name:"Sequences",    emoji:"🔢", cls:"t-seq",    unlock:0},
+  fdp:    {name:"Fractions & %", emoji:"🍕", cls:"t-fdp",   unlock:0},
+  neg:    {name:"Negatives",    emoji:"🌡️", cls:"t-neg",     unlock:25},
+  bidmas: {name:"BIDMAS",       emoji:"🧮", cls:"t-bidmas",  unlock:60},
+  algebra:{name:"Algebra",      emoji:"⚖️", cls:"t-algebra", unlock:110},
+};
+function isUnlocked(k){ return S.totalCorrect >= (SKILLS[k].unlock||0); }
+function unlockedKeys(){ return Object.keys(SKILLS).filter(isUnlocked); }
+
+const QUOTES = [
+  ["Mistakes are proof you are ","trying","."],
+  ["Every expert was once a ","beginner","."],
+  ["You don't have to be perfect. Just ","keep going","."],
+  ["The brain grows when it ","struggles"," — that's the point."],
+  ["Slow is smooth. Smooth is ","fast","."],
+  ["You can't do it… ","yet","."],
+  ["One question at a time. That's how ","champions"," train."],
+  ["Getting it wrong is how you ","find the gap","."],
+];
+
+const STICKERS = [
+  {id:"first",   emo:"🌟", nm:"First Steps",  test:s=>s.totalCorrect>=1},
+  {id:"streak3", emo:"🔥", nm:"3 Day Streak", test:s=>s.streak>=3},
+  {id:"streak7", emo:"⚡", nm:"Week Warrior", test:s=>s.streak>=7},
+  {id:"gold100", emo:"🪙", nm:"100 Gold",     test:s=>s.gold>=100},
+  {id:"gold500", emo:"💰", nm:"Gold Hoard",   test:s=>s.gold>=500},
+  {id:"combo10", emo:"🚀", nm:"Combo x10",    test:s=>s.maxCombo>=10},
+  {id:"c50",     emo:"🎯", nm:"50 Correct",   test:s=>s.totalCorrect>=50},
+  {id:"c250",    emo:"🧠", nm:"250 Correct",  test:s=>s.totalCorrect>=250},
+  {id:"tmaster", emo:"✖️", nm:"Tables Boss",  test:s=>mastered(s,"times")},
+  {id:"amaster", emo:"📐", nm:"Angle Ace",    test:s=>mastered(s,"angles")},
+  {id:"smaster", emo:"🔢", nm:"Sequence Star",test:s=>mastered(s,"seq")},
+  {id:"fmaster", emo:"🍕", nm:"Fraction Hero",test:s=>mastered(s,"fdp")},
+  {id:"mission5",emo:"🏅", nm:"5 Missions",   test:s=>s.missionsDone>=5},
+  {id:"perfect", emo:"👑", nm:"Perfect Round",test:s=>s.perfectRounds>=1},
+  {id:"early",   emo:"🦉", nm:"Night Owl",    test:s=>s.owl},
+  {id:"comeback",emo:"💪", nm:"Bounce Back",  test:s=>s.comeback},
+  {id:"unlock1", emo:"🌡️", nm:"Negatives!",   test:s=>s.totalCorrect>=25},
+  {id:"nmaster", emo:"🥷", nm:"Negative Ninja",test:s=>mastered(s,"neg")},
+  {id:"unlock2", emo:"🧮", nm:"BIDMAS!",       test:s=>s.totalCorrect>=60},
+  {id:"bmaster", emo:"🎛️", nm:"Order Boss",    test:s=>mastered(s,"bidmas")},
+  {id:"unlock3", emo:"⚖️", nm:"Algebra!",      test:s=>s.totalCorrect>=110},
+  {id:"almaster",emo:"🧙", nm:"Algebra Ace",   test:s=>mastered(s,"algebra")},
+  {id:"allunlk", emo:"🌈", nm:"Full Set",      test:s=>s.totalCorrect>=110},
+];
+
+function mastered(s,skill){
+  const st=s.skillStats[skill]; if(!st||st.seen<20) return false;
+  return st.correct/st.seen>=0.85;
+}
+
+/* ---------- state ---------- */
+const DEF = {
+  day:1, lastPlayed:null, streak:0, gold:0,
+  totalCorrect:0, totalSeen:0, maxCombo:0, missionsDone:0, perfectRounds:0,
+  owl:false, comeback:false,
+  bests:{}, skillStats:{}, errors:{}, history:[], stickers:[],
+  missionToday:{date:null, done:0, target:20, complete:false},
+  weakFocus:[]
+};
+let S = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem("wolfieArcade");
+    if(!raw) return structuredClone(DEF);
+    const p = JSON.parse(raw);
+    return Object.assign(structuredClone(DEF), p);
+  }catch(e){ return structuredClone(DEF); }
+}
+function save(){
+  try{ localStorage.setItem("wolfieArcade", JSON.stringify(S)); }catch(e){}
+}
+
+/* ---------- daily rollover ---------- */
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function rollover(){
+  const t = todayStr();
+  if(S.lastPlayed !== t){
+    // work out streak + day counter
+    if(S.lastPlayed){
+      const diff = Math.round((new Date(t)-new Date(S.lastPlayed))/864e5);
+      if(diff===1){ /* streak continues once they play today */ }
+      else if(diff>1){ S.streak=0; } // missed a day
+    }
+    // set up today's mission, focusing yesterday's weak spots
+    S.weakFocus = topWeak(3);
+    S.missionToday = {date:t, done:0, target:20, complete:false};
+    if(S.history.length) S.day = S.history.length+1;
+  }
+  save();
+}
+
+/* ---------- adaptive weakness ---------- */
+function logResult(skill, subtype, correct){
+  S.skillStats[skill] = S.skillStats[skill] || {seen:0,correct:0};
+  S.skillStats[skill].seen++; if(correct) S.skillStats[skill].correct++;
+  const key = skill+"::"+subtype;
+  S.errors[key] = S.errors[key] || {seen:0,wrong:0,skill,subtype};
+  S.errors[key].seen++; if(!correct) S.errors[key].wrong++;
+  S.totalSeen++; if(correct) S.totalCorrect++;
+}
+function topWeak(n){
+  return Object.values(S.errors)
+    .filter(e=>e.wrong>=2 && e.wrong/e.seen>=0.34)
+    .sort((a,b)=> (b.wrong/b.seen)-(a.wrong/a.seen) || b.wrong-a.wrong)
+    .slice(0,n);
+}
+function skillWeakCount(skill){
+  return Object.values(S.errors).filter(e=>e.skill===skill && e.wrong>=2 && e.wrong/e.seen>=0.34).length;
+}
+
+/* ============================================================
+   QUESTION GENERATORS  -> {q, sub, ans, tag, skill, subtype}
+   ans is a normalised string; accept numeric or a/b
+   ============================================================ */
+const R = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick = arr=>arr[Math.floor(Math.random()*arr.length)];
+const gcd = (a,b)=>b?gcd(b,a%b):a;
+
+function genTimes(focusSub){
+  let a,b;
+  if(focusSub){ a=+focusSub; b=R(2,12); }
+  else { a=R(2,12); b=R(2,12); }
+  return {q:`${a} × ${b}`, sub:"", ans:String(a*b), tag:"Times Tables",
+          skill:"times", subtype:String(Math.max(a,b))};
+}
+
+function genMental(focusSub){
+  const types = ["add2","sub2","x1dig","half","to100","div"];
+  const t = focusSub && types.includes(focusSub) ? focusSub : pick(types);
+  let q,ans,sub="";
+  if(t==="add2"){ const a=R(23,89),b=R(14,79); q=`${a} + ${b}`; ans=a+b; }
+  else if(t==="sub2"){ let a=R(40,99),b=R(11,39); q=`${a} − ${b}`; ans=a-b; }
+  else if(t==="x1dig"){ const a=R(12,29),b=R(3,9); q=`${a} × ${b}`; ans=a*b; }
+  else if(t==="half"){ const a=R(6,49)*2; q=`Half of ${a}`; ans=a/2; }
+  else if(t==="to100"){ const a=R(12,88); q=`${a} + ? = 100`; ans=100-a; sub="What's missing?"; }
+  else { const b=R(3,9), ans2=R(4,12); q=`${b*ans2} ÷ ${b}`; ans=ans2; }
+  return {q, sub, ans:String(ans), tag:"Mental Maths", skill:"mental", subtype:t};
+}
+
+function genAngles(focusSub){
+  const types = ["line","point","triangle","vert"];
+  const t = focusSub && types.includes(focusSub) ? focusSub : pick(types);
+  let q,ans,sub;
+  if(t==="line"){
+    const a=R(30,140); ans=180-a;
+    q=`${a}°  x°`; sub="Angles on a straight line add to 180°. Find x.";
+  } else if(t==="point"){
+    const a=R(80,140), b=R(60,130); ans=360-a-b;
+    q=`${a}°  ${b}°  x°`; sub="Angles round a point add to 360°. Find x.";
+  } else if(t==="triangle"){
+    const a=R(40,90), b=R(30,80); ans=180-a-b;
+    q=`${a}°  ${b}°  x°`; sub="Angles in a triangle add to 180°. Find x.";
+  } else {
+    const a=R(35,145); ans=a;
+    q=`${a}°  x°`; sub="Vertically opposite angles are equal. Find x.";
+  }
+  return {q, sub, ans:String(ans), tag:"Angles", skill:"angles", subtype:t};
+}
+
+function genSeq(focusSub){
+  const types=["arith","geo","missing"];
+  const t = focusSub && types.includes(focusSub) ? focusSub : pick(types);
+  let q,ans,sub;
+  if(t==="arith"){
+    const start=R(1,9), step=R(2,9);
+    const seq=[start,start+step,start+2*step,start+3*step];
+    ans=start+4*step; q=seq.join(",  ")+",  ?"; sub="Find the next term.";
+  } else if(t==="geo"){
+    const start=R(1,4), ratio=pick([2,3]);
+    const seq=[start,start*ratio,start*ratio*ratio];
+    ans=start*Math.pow(ratio,3); q=seq.join(",  ")+",  ?"; sub="Find the next term.";
+  } else {
+    const start=R(2,7), step=R(3,8);
+    const full=[start,start+step,start+2*step,start+3*step,start+4*step];
+    full[2]="?"; ans=start+2*step;
+    q=full.join(",  "); sub="Find the missing term.";
+  }
+  return {q, sub, ans:String(ans), tag:"Sequences", skill:"seq", subtype:t};
+}
+
+function genFDP(focusSub){
+  const types=["fracOf","pctOf","simplify","toDec","toPct"];
+  const t = focusSub && types.includes(focusSub) ? focusSub : pick(types);
+  let q,ans,sub="";
+  if(t==="fracOf"){
+    const den=pick([2,3,4,5,10]), num=R(1,den-1), whole=den*R(2,9);
+    ans=whole/den*num; q=`${num}/${den} of ${whole}`; sub="Type the number.";
+  } else if(t==="pctOf"){
+    const p=pick([10,20,25,50,5,15]), base=pick([20,40,60,80,120,200,50,90]);
+    ans=p/100*base; q=`${p}% of ${base}`;
+  } else if(t==="simplify"){
+    const f=pick([[2,4],[3,6],[4,8],[6,9],[10,15],[8,12],[5,20],[9,12],[6,8]]);
+    const g=gcd(f[0],f[1]); ans=`${f[0]/g}/${f[1]/g}`;
+    q=`Simplify  ${f[0]}/${f[1]}`; sub="Type like 1/2";
+  } else if(t==="toDec"){
+    const f=pick([["1/2","0.5"],["1/4","0.25"],["3/4","0.75"],["1/5","0.2"],["1/10","0.1"],["3/5","0.6"],["7/10","0.7"]]);
+    q=`${f[0]} as a decimal`; ans=f[1];
+  } else {
+    const f=pick([["1/2","50"],["1/4","25"],["3/4","75"],["1/5","20"],["1/10","10"],["2/5","40"],["3/5","60"]]);
+    q=`${f[0]} as a %`; ans=f[1]; sub="Just the number.";
+  }
+  return {q, sub, ans:String(ans), tag:"Fractions & %", skill:"fdp", subtype:t};
+}
+
+function genNeg(focusSub){
+  const types=["addNeg","subNeg","mulNeg","divNeg"];
+  const t=focusSub&&types.includes(focusSub)?focusSub:pick(types);
+  let q,ans,sub="Answer can be negative — use the − key.";
+  if(t==="addNeg"){ const a=R(-9,-2), b=R(3,12); ans=a+b; q=`${a} + ${b}`; }
+  else if(t==="subNeg"){
+    if(Math.random()<.5){ const a=R(2,8), b=R(4,12); ans=a-b; q=`${a} − ${b}`; }
+    else { const a=R(1,8), b=R(-9,-2); ans=a-b; q=`${a} − (${b})`; sub="Two minuses make a plus. Use the − key."; }
+  }
+  else if(t==="mulNeg"){
+    if(Math.random()<.5){ const a=R(-9,-2), b=R(2,9); ans=a*b; q=`${a} × ${b}`; }
+    else { const a=R(-9,-2), b=R(-9,-2); ans=a*b; q=`${a} × (${b})`; sub="Negative × negative = positive."; }
+  }
+  else { const b=R(2,9), r=R(2,9); ans=-r; q=`${-b*r} ÷ ${b}`; }
+  return {q, sub, ans:String(ans), tag:"Negatives", skill:"neg", subtype:t};
+}
+
+function genBidmas(focusSub){
+  const types=["bTimes","bBrackets","bDiv","bPower"];
+  const t=focusSub&&types.includes(focusSub)?focusSub:pick(types);
+  let q,ans,sub="Order: Brackets, Indices, ÷×, +−.";
+  if(t==="bTimes"){ const a=R(2,9),b=R(2,6),c=R(2,6); ans=a+b*c; q=`${a} + ${b} × ${c}`; }
+  else if(t==="bBrackets"){ const a=R(2,7),b=R(2,7),c=R(2,5); ans=(a+b)*c; q=`(${a} + ${b}) × ${c}`; }
+  else if(t==="bDiv"){ const c=R(2,6), b=c*R(2,5), a=R(15,40); ans=a-b/c; q=`${a} − ${b} ÷ ${c}`; }
+  else { const n=R(2,5), a=R(2,8); ans=a+n*n; q=`${a} + ${n}²`; sub=`A power means times itself. ${n}² = ${n}×${n}.`; }
+  return {q, sub, ans:String(ans), tag:"BIDMAS", skill:"bidmas", subtype:t};
+}
+
+function genAlgebra(focusSub){
+  const types=["aOne","aTwo","aSub"];
+  const t=focusSub&&types.includes(focusSub)?focusSub:pick(types);
+  let q,ans,sub;
+  if(t==="aOne"){
+    const style=pick(["add","sub","mul"]); const x=R(2,12);
+    if(style==="add"){ const b=R(2,15); q=`x + ${b} = ${x+b}`; ans=x; }
+    else if(style==="sub"){ const b=R(2,9); q=`x − ${b} = ${x-b}`; ans=x; }
+    else { const b=R(2,9); q=`${b}x = ${b*x}`; ans=x; }
+    sub="Find x. Get x on its own.";
+  } else if(t==="aTwo"){
+    const a=R(2,6), x=R(2,9), b=R(2,12);
+    if(Math.random()<.5){ q=`${a}x + ${b} = ${a*x+b}`; } else { q=`${a}x − ${b} = ${a*x-b}`; }
+    ans=x; sub="Two steps. Undo +/− first, then ÷.";
+  } else {
+    const a=R(2,6), b=R(1,9), x=R(2,9); ans=a*x+b;
+    q=`If x = ${x},  find  ${a}x + ${b}`; sub="Put the number in place of x.";
+  }
+  return {q, sub, ans:String(ans), tag:"Algebra", skill:"algebra", subtype:t};
+}
+
+const GEN = {times:genTimes, mental:genMental, angles:genAngles, seq:genSeq, fdp:genFDP,
+             neg:genNeg, bidmas:genBidmas, algebra:genAlgebra};
+
+/* normalise an answer for comparison (handles a/b and decimals) */
+function normalise(str){
+  str = String(str).trim().replace(/\s+/g,"").replace(/°/g,"");
+  if(str.includes("/")){
+    const [a,b]=str.split("/").map(Number);
+    if(b) { const g=gcd(Math.abs(a),Math.abs(b))||1; return (a/g)+"/"+(b/g); }
+  }
+  if(str!=="" && !isNaN(str)) return String(parseFloat(str));
+  return str;
+}
+function isCorrect(given, ans){
+  return normalise(given)===normalise(ans);
+}
+
+/* ============================================================
+   AUDIO — generated, no files
+   ============================================================ */
+let AC=null;
+function actx(){ if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return AC; }
+function tone(freq,dur,type="sine",vol=.18,delay=0){
+  const c=actx(); if(!c) return;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.value=freq;
+  o.connect(g); g.connect(c.destination);
+  const t=c.currentTime+delay;
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(vol,t+.02);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.start(t); o.stop(t+dur);
+}
+const sfx = {
+  correct(){ tone(523,.12,"triangle"); tone(659,.12,"triangle",.18,.09); tone(784,.18,"triangle",.18,.18); },
+  wrong(){ tone(200,.18,"sawtooth",.14); tone(150,.22,"sawtooth",.12,.1); },
+  coin(){ tone(880,.06,"square",.12); tone(1175,.1,"square",.12,.05); },
+  combo(n){ tone(440+n*60,.12,"triangle",.2); },
+  win(){ [523,659,784,1047].forEach((f,i)=>tone(f,.25,"triangle",.2,i*.12)); },
+  sticker(){ [659,784,988,1319].forEach((f,i)=>tone(f,.3,"triangle",.22,i*.1)); },
+};
+
+/* ============================================================
+   GAME ENGINE
+   ============================================================ */
+let G = null; // current game
+function buildQueue(skill, count, missionMode){
+  const q=[];
+  // front-load focus subtypes for this skill if weak
+  const focuses = missionMode
+    ? S.weakFocus.slice()
+    : Object.values(S.errors).filter(e=>e.skill===skill && e.wrong>=2);
+  for(let i=0;i<count;i++){
+    if(missionMode){
+      // mission mixes unlocked skills, weighting weak ones first
+      const pool=unlockedKeys();
+      let sk, foc=null;
+      if(i<focuses.length && focuses[i] && isUnlocked(focuses[i].skill)){ sk=focuses[i].skill; foc=focuses[i].subtype; }
+      else { sk=pick(pool); }
+      q.push(GEN[sk](foc));
+    } else {
+      let foc=null;
+      if(i<focuses.length && focuses[i]) foc=focuses[i].subtype;
+      q.push(GEN[skill](foc));
+    }
+  }
+  return q;
+}
+
+function startGame(skill, missionMode){
+  actx(); // unlock audio on user gesture
+  rollover();
+  const count = missionMode ? S.missionToday.target : 10;
+  G = {
+    skill, missionMode, queue:buildQueue(skill,count,missionMode),
+    idx:0, score:0, combo:0, correct:0, wrong:0,
+    goldEarned:0, startedWrong:false, wrongThenRight:false,
+    bestKey: missionMode ? "mission" : skill,
+    tStart:0, current:null, answered:false, input:""
+  };
+  G.best = S.bests[G.bestKey]||0;
+  show("game");
+  document.getElementById("sBest").textContent = G.best;
+  nextQ();
+}
+
+let timerId=null;
+function nextQ(){
+  if(G.idx>=G.queue.length) return endGame();
+  G.current = G.queue[G.idx];
+  G.answered=false; G.input="";
+  const c=G.current;
+  document.getElementById("qtag").textContent = c.tag;
+  document.getElementById("qtext").innerHTML = c.q;
+  document.getElementById("qsub").textContent = c.sub||"";
+  document.getElementById("qcount").textContent = (G.idx+1)+"/"+G.queue.length;
+  document.getElementById("prog").style.width = (G.idx/G.queue.length*100)+"%";
+  document.getElementById("sScore").textContent = G.score;
+  document.getElementById("sCombo").textContent = "x"+comboMult();
+  const box=document.getElementById("ansbox");
+  box.className="ansbox"; box.innerHTML="&nbsp;";
+  document.getElementById("feedback").className="feedback";
+  document.getElementById("feedback").textContent="";
+  document.getElementById("qcard").className="qcard";
+  // timer
+  G.tStart=performance.now();
+  clearInterval(timerId);
+  timerId=setInterval(()=>{
+    const s=(performance.now()-G.tStart)/1000;
+    document.getElementById("qtimer").textContent=s.toFixed(1)+"s";
+  },100);
+  buildPad();
+}
+
+function comboMult(){
+  if(G.combo>=8) return 3; if(G.combo>=5) return 2; if(G.combo>=3) return 1.5; return 1;
+}
+
+function buildPad(){
+  const pad=document.getElementById("pad");
+  const sk=G.current.skill;
+  const special = sk==="fdp" ? "/" : sk==="neg" ? "−" : ".";
+  const keys = ["1","2","3","4","5","6","7","8","9"];
+  pad.innerHTML="";
+  keys.forEach(k=>pad.appendChild(mkKey(k)));
+  pad.appendChild(mkKey(special,"wide"));
+  pad.appendChild(mkKey("0"));
+  pad.appendChild(mkKey("⌫","del"));
+  const go=mkKey("✓ Go","go"); go.style.gridColumn="span 3"; pad.appendChild(go);
+}
+function mkKey(label,extra){
+  const b=document.createElement("button");
+  b.className="key"+(extra?" "+extra:""); b.textContent=label;
+  b.onclick=()=>press(label);
+  return b;
+}
+function press(k){
+  if(G.answered) return;
+  if(k==="⌫"){ G.input=G.input.slice(0,-1); }
+  else if(k==="✓ Go"){ return submit(); }
+  else if(k==="−"){ G.input = G.input.startsWith("-") ? G.input.slice(1) : "-"+G.input; }
+  else { if(G.input.length<7) G.input+=k; }
+  const box=document.getElementById("ansbox");
+  box.textContent = G.input||" "; if(!G.input) box.innerHTML="&nbsp;";
+}
+
+document.addEventListener("keydown",e=>{
+  if(document.getElementById("game").classList.contains("hide")) return;
+  if(/[0-9]/.test(e.key)) press(e.key);
+  else if(e.key===".") press(".");
+  else if(e.key==="/") press("/");
+  else if(e.key==="-") press("−");
+  else if(e.key==="Backspace"){ e.preventDefault(); press("⌫"); }
+  else if(e.key==="Enter"){ e.preventDefault(); press("✓ Go"); }
+});
+
+function submit(){
+  if(G.answered||G.input==="") return;
+  G.answered=true; clearInterval(timerId);
+  const c=G.current;
+  const secs=(performance.now()-G.tStart)/1000;
+  const ok=isCorrect(G.input, c.ans);
+  logResult(c.skill,c.subtype,ok);
+  const box=document.getElementById("ansbox");
+  const fb=document.getElementById("feedback");
+  const card=document.getElementById("qcard");
+  if(ok){
+    G.correct++; G.combo++;
+    if(G.combo>S.maxCombo) S.maxCombo=G.combo;
+    const mult=comboMult();
+    const speed = secs<4?3:secs<7?1:0;
+    const pts = Math.round((10+speed*2)*mult);
+    G.score+=pts;
+    const coins=Math.max(2,Math.round(pts/3)); G.goldEarned+=coins; S.gold+=coins;
+    box.className="ansbox ok"; box.textContent=G.input;
+    card.className="qcard flash-ok";
+    fb.className="feedback ok";
+    fb.textContent = G.combo>=3 ? `🔥 ${G.combo} in a row! +${pts}` : `Nice! +${pts}`;
+    sfx.correct(); if(G.combo>=3) sfx.combo(G.combo);
+    coinBurst(coins);
+    if(G.startedWrong) G.wrongThenRight=true;
+  } else {
+    G.wrong++; G.combo=0; G.startedWrong=true;
+    box.className="ansbox no"; box.textContent=G.input;
+    card.className="qcard flash-no";
+    fb.className="feedback no";
+    fb.innerHTML = `Not quite — answer was <b>${c.ans}</b>`;
+    sfx.wrong();
+  }
+  document.getElementById("sScore").textContent=G.score;
+  document.getElementById("sCombo").textContent="x"+comboMult();
+  document.getElementById("qtimer").textContent=secs.toFixed(1)+"s";
+  if(G.missionMode && !S.missionToday.complete){
+    S.missionToday.done=Math.min(S.missionToday.target,S.missionToday.done+1);
+  }
+  save();
+  setTimeout(()=>{ G.idx++; nextQ(); }, ok?750:1500);
+}
+
+function coinBurst(n){
+  const box=document.getElementById("ansbox").getBoundingClientRect();
+  for(let i=0;i<Math.min(n,6);i++){
+    const el=document.createElement("div");
+    el.className="burst"; el.textContent="🪙";
+    el.style.left=(box.left+box.width/2+R(-40,40))+"px";
+    el.style.top=(box.top-10)+"px";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1000);
+  }
+  sfx.coin();
+}
+
+/* ---------- end of round ---------- */
+function endGame(){
+  clearInterval(timerId);
+  // newly unlocked skills (totalCorrect climbed past a threshold this round)
+  const prevCorrect = S.totalCorrect - G.correct;
+  const justUnlocked = Object.entries(SKILLS)
+    .filter(([k,v])=>v.unlock>0 && prevCorrect < v.unlock && S.totalCorrect >= v.unlock)
+    .map(([k,v])=>v);
+  const acc = G.correct+G.wrong ? Math.round(G.correct/(G.correct+G.wrong)*100) : 0;
+  const perfect = G.wrong===0 && G.correct>=8;
+  if(perfect) S.perfectRounds++;
+  if(G.wrongThenRight) S.comeback=true;
+  const hr=new Date().getHours(); if(hr>=20||hr<6) S.owl=true;
+
+  // best?
+  const newBest = G.score>(S.bests[G.bestKey]||0);
+  if(newBest) S.bests[G.bestKey]=G.score;
+
+  // mission complete?
+  let missionJustDone=false;
+  if(G.missionMode && S.missionToday.done>=S.missionToday.target && !S.missionToday.complete){
+    S.missionToday.complete=true; missionJustDone=true;
+    S.missionsDone++;
+    // streak + day advance happen on mission completion
+    const t=todayStr();
+    if(S.lastPlayed!==t){ S.streak++; }
+    S.lastPlayed=t;
+  } else if(!G.missionMode){
+    // free play still counts as "played today" for streak-keeping if mission already done
+    if(S.lastPlayed!==todayStr() && S.missionToday.complete){ S.lastPlayed=todayStr(); }
+  }
+
+  // history
+  S.history.push({date:todayStr(), skill:G.skill, score:G.score, acc, correct:G.correct, total:G.correct+G.wrong});
+  if(S.history.length>60) S.history=S.history.slice(-60);
+
+  // stickers
+  const before=new Set(S.stickers);
+  const snap = {
+    totalCorrect:S.totalCorrect, streak:S.streak, gold:S.gold, maxCombo:S.maxCombo,
+    missionsDone:S.missionsDone, perfectRounds:S.perfectRounds, owl:S.owl, comeback:S.comeback,
+    skillStats:S.skillStats
+  };
+  const won=[];
+  STICKERS.forEach(st=>{ if(!before.has(st.id) && st.test(snap)){ S.stickers.push(st.id); won.push(st); } });
+
+  save();
+  showResults({acc, perfect, newBest, missionJustDone, won, justUnlocked});
+}
+
+function showResults({acc,perfect,newBest,missionJustDone,won,justUnlocked}){
+  show("results");
+  const uw=document.getElementById("rUnlock");
+  if(justUnlocked && justUnlocked.length){
+    uw.classList.remove("hide");
+    uw.innerHTML = `<b>🎊 NEW SKILL UNLOCKED!</b><div class="row">`+
+      justUnlocked.map(v=>`<span>${v.emoji}</span>`).join("")+`</div>`+
+      `<p style="font-weight:800;margin-top:6px;font-size:13px">`+
+      justUnlocked.map(v=>v.name).join(" & ")+` — try it in Free Play!</p>`;
+    setTimeout(()=>sfx.sticker(),700);
+  } else uw.classList.add("hide");
+  document.getElementById("rCrown").textContent = perfect?"👑":acc>=70?"🎉":"💪";
+  document.getElementById("rTitle").textContent =
+    missionJustDone ? "Mission Complete!" : perfect ? "PERFECT ROUND!" : acc>=70 ? "Great work, Wolfie!" : "Good effort — keep going!";
+  const rb=document.getElementById("rBest");
+  rb.innerHTML = newBest ? '<div class="newbest">🏆 NEW BEST SCORE!</div>' : "";
+  document.getElementById("rScore").textContent=G.score;
+  document.getElementById("rAcc").textContent=acc+"%";
+  document.getElementById("rGold").textContent="+"+G.goldEarned;
+  if(newBest||missionJustDone||perfect) sfx.win();
+
+  // stickers
+  const sw=document.getElementById("rSticker");
+  if(won.length){
+    sw.classList.remove("hide");
+    document.getElementById("rStickerRow").innerHTML = won.map(w=>`<span title="${w.nm}">${w.emo}</span>`).join("");
+    setTimeout(()=>sfx.sticker(),400);
+  } else sw.classList.add("hide");
+
+  // coaching / next steps
+  const coach=document.getElementById("rCoach");
+  const weak=topWeak(3);
+  let html="";
+  if(missionJustDone){
+    html+=`<h3>🔥 Streak: ${S.streak} day${S.streak===1?"":"s"}!</h3>`;
+  } else {
+    html+=`<h3>What I noticed</h3>`;
+  }
+  if(weak.length){
+    html+=`<p class="warn">⚠ Keep tripping on: ${weak.map(w=>label(w.skill,w.subtype)).join(", ")}.</p>`;
+    html+=`<p>${nextStep(weak[0])}</p>`;
+    html+=`<p style="opacity:.8">Tomorrow's mission will warm up with these first.</p>`;
+  } else if(G.correct+G.wrong>0){
+    html+=`<p>Rock solid — no repeated slip-ups. Time to push the difficulty up! 🚀</p>`;
+  }
+  coach.innerHTML=html;
+
+  // remember free-play skill for "play again"
+  G.replaySkill=G.skill; G.replayMission=G.missionMode;
+}
+
+function label(skill,sub){
+  const map={
+    add2:"2-digit adding", sub2:"2-digit subtracting", x1dig:"×2-digit", half:"halving",
+    to100:"adding to 100", div:"dividing",
+    line:"angles on a line", point:"angles round a point", triangle:"angles in a triangle", vert:"vertically opposite",
+    arith:"number patterns", geo:"doubling/tripling patterns", missing:"missing terms",
+    fracOf:"fractions of amounts", pctOf:"percentages of amounts", simplify:"simplifying fractions",
+    toDec:"fraction→decimal", toPct:"fraction→percent",
+    addNeg:"adding negatives", subNeg:"subtracting negatives", mulNeg:"multiplying negatives", divNeg:"dividing negatives",
+    bTimes:"times-before-add", bBrackets:"brackets first", bDiv:"divide-before-subtract", bPower:"powers first",
+    aOne:"one-step equations", aTwo:"two-step equations", aSub:"substitution"
+  };
+  if(map[sub]) return map[sub];
+  if(SKILLS[skill]) return SKILLS[skill].name.toLowerCase()+" ("+sub+"×)";
+  return sub;
+}
+function nextStep(w){
+  const tips={
+    times:`Try chanting the ${w.subtype}× table out loud on the way to school — say the whole fact, "seven eights are fifty-six".`,
+    mental:`Break it into friendly chunks: 10s first, then the rest. Practice makes these automatic.`,
+    angles:`Draw the diagram and write the rule beside it every time — "straight line = 180°" — before you calculate.`,
+    seq:`Find the jump between terms first. Write the gap in the gap. Then keep adding it.`,
+    fdp:`Remember the anchors: ½=0.5=50%, ¼=0.25=25%. Build everything else from those.`,
+    neg:`Picture a number line. Adding moves right, subtracting moves left. Two minuses touching make a plus.`,
+    bidmas:`Brackets → Indices → Divide/Multiply → Add/Subtract. Do them strictly in that order, not left to right.`,
+    algebra:`Whatever you do to one side, do to the other. Undo the equation one step at a time to get x alone.`
+  };
+  return "👉 "+(tips[w.skill]||"Keep practising this one — it's nearly there.");
+}
+
+/* ============================================================
+   HOME / NAV
+   ============================================================ */
+const screens=["home","game","results","book","stats"];
+function show(id){ screens.forEach(s=>document.getElementById(s).classList.toggle("hide",s!==id)); window.scrollTo(0,0); }
+
+function renderHome(){
+  rollover();
+  document.getElementById("streakN").textContent=S.streak;
+  document.getElementById("goldN").textContent=S.gold;
+  document.getElementById("dayN").textContent=Math.max(1,S.history.length? new Set(S.history.map(h=>h.date)).size : 1);
+  // quote
+  const qparts=pick(QUOTES);
+  document.getElementById("quote").innerHTML=qparts.map((p,i)=>i===1?`<span>${p}</span>`:p).join("");
+  // mission ring
+  const m=S.missionToday;
+  const pct = m.complete?100:Math.round(m.done/m.target*100);
+  const ring=document.getElementById("ring");
+  ring.style.setProperty("--p",pct);
+  document.getElementById("ringV").textContent=pct+"%";
+  const btn=document.getElementById("startMission");
+  if(m.complete){ btn.classList.add("done"); btn.textContent="✅ Mission done — Free Play!"; document.getElementById("missionP").textContent="Smashed it. Keep the streak alive tomorrow, or free-play for more gold."; }
+  else if(m.done>0){ btn.textContent=`▶ Continue Mission (${m.done}/${m.target})`; }
+  else { btn.classList.remove("done"); btn.textContent="▶ Start Today's Mission"; }
+  if(S.weakFocus.length){
+    document.getElementById("missionP").textContent=`Warming up your tricky bits: ${S.weakFocus.map(w=>label(w.skill,w.subtype)).join(", ")}.`;
+  }
+  // greeting by time
+  const hr=new Date().getHours();
+  document.getElementById("greet").textContent = hr<12?"Morning, Wolfie! ☀️":hr<17?"Hey Wolfie! 👋":"Evening, Wolfie! 🌙";
+  // skill tiles
+  const grid=document.getElementById("skillGrid"); grid.innerHTML="";
+  Object.entries(SKILLS).forEach(([k,v])=>{
+    const best=S.bests[k]||0; const wk=skillWeakCount(k);
+    const b=document.createElement("button");
+    if(isUnlocked(k)){
+      b.className="tile "+v.cls;
+      b.innerHTML=`${wk?`<span class="weak">focus ${wk}</span>`:""}
+        <span class="emo">${v.emoji}</span>
+        <span class="nm">${v.name}</span>
+        <span class="best">🏆 Best ${best}</span>`;
+      b.onclick=()=>startGame(k,false);
+    } else {
+      const pct=Math.min(100,Math.round(S.totalCorrect/v.unlock*100));
+      b.className="tile "+v.cls+" locked";
+      b.innerHTML=`<span class="lock">🔒 ${S.totalCorrect}/${v.unlock}</span>
+        <span class="emo">${v.emoji}</span>
+        <span class="nm">${v.name}</span>
+        <span class="best">Unlock at ${v.unlock} correct</span>
+        <span class="lockbar"><i style="width:${pct}%"></i></span>`;
+      b.onclick=()=>{ b.animate([{transform:"translateX(-4px)"},{transform:"translateX(4px)"},{transform:"translateX(0)"}],{duration:220}); };
+    }
+    grid.appendChild(b);
+  });
+}
+
+/* ---------- sticker book ---------- */
+function renderBook(){
+  show("book");
+  const have=new Set(S.stickers);
+  document.getElementById("bookCount").textContent=`${have.size} of ${STICKERS.length} collected — keep playing to unlock them all!`;
+  const g=document.getElementById("bookGrid"); g.innerHTML="";
+  STICKERS.forEach(st=>{
+    const owned=have.has(st.id);
+    const d=document.createElement("div");
+    d.className="st "+(owned?"have":"locked");
+    d.innerHTML=`${owned?st.emo:"🔒"}<span class="nm">${st.nm}</span>`;
+    g.appendChild(d);
+  });
+}
+
+/* ---------- stats ---------- */
+function renderStats(){
+  show("stats");
+  const body=document.getElementById("statsBody");
+  if(!S.history.length){ body.innerHTML=`<div class="empty">No rounds yet — play your first mission and your progress will grow here! 🌱</div>`; return; }
+  // per-skill accuracy
+  let html=`<div class="section-t" style="font-size:15px">🎯 Accuracy by skill</div>`;
+  Object.entries(SKILLS).forEach(([k,v])=>{
+    const st=S.skillStats[k];
+    if(!st||!st.seen) return;
+    const acc=Math.round(st.correct/st.seen*100);
+    html+=`<div class="wk"><b>${v.emoji} ${v.name}</b><span class="acc ${acc<60?'low':''}">${acc}% <span style="opacity:.6;font-weight:700">(${st.seen} done)</span></span></div>`;
+  });
+  // last sessions
+  html+=`<div class="section-t" style="font-size:15px;margin-top:18px">📅 Recent rounds</div><div class="days">`;
+  const recent=S.history.slice(-8).reverse();
+  const max=Math.max(...recent.map(h=>h.score),1);
+  recent.forEach(h=>{
+    const nm=h.skill==="mission"?"Mission":(SKILLS[h.skill]?SKILLS[h.skill].name:h.skill);
+    html+=`<div class="dayrow"><span class="d">${nm}</span><span class="bar"><i style="width:${h.score/max*100}%"></i></span><span class="v">${h.score}</span></div>`;
+  });
+  html+=`</div>`;
+  // weak spots
+  const weak=topWeak(4);
+  if(weak.length){
+    html+=`<div class="section-t" style="font-size:15px;margin-top:18px">🔧 Working on</div>`;
+    weak.forEach(w=>{ html+=`<div class="wk"><b>${label(w.skill,w.subtype)}</b><span class="acc low">${Math.round((1-w.wrong/w.seen)*100)}%</span></div>`; });
+  }
+  body.innerHTML=html;
+}
+
+/* ---------- wire up ---------- */
+document.getElementById("startMission").onclick=()=>{
+  if(S.missionToday.complete){ startGame(pick(Object.keys(SKILLS)),false); }
+  else startGame(pick(Object.keys(SKILLS)),true);
+};
+document.getElementById("quitGame").onclick=()=>{ clearInterval(timerId); renderHome(); show("home"); };
+document.getElementById("rAgain").onclick=()=>startGame(G.replaySkill,G.replayMission && !S.missionToday.complete);
+document.getElementById("rHome").onclick=()=>{ renderHome(); show("home"); };
+document.getElementById("openBook").onclick=renderBook;
+document.getElementById("bookBack").onclick=()=>{ renderHome(); show("home"); };
+document.getElementById("openStats").onclick=renderStats;
+document.getElementById("statsBack").onclick=()=>{ renderHome(); show("home"); };
+
+/* ---------- go ---------- */
+renderHome();
+</script>
+</body>
+</html>
