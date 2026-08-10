@@ -680,8 +680,12 @@ function comboMult(){
 
 function buildPad(){
   const pad=document.getElementById("pad");
-  const sk=G.current.skill;
-  const special = sk==="fdp" ? "/" : sk==="neg" ? "−" : ".";
+  const sk=G.current.skill, st=G.current.subtype;
+  // Pick the extra key by what THIS question's answer actually needs:
+  // fraction-simplifying needs "/", negatives need "−", everything else (incl. decimals) needs "."
+  let special=".";
+  if(sk==="fdp" && st==="simplify") special="/";
+  else if(sk==="neg") special="−";
   const keys = ["1","2","3","4","5","6","7","8","9"];
   pad.innerHTML="";
   keys.forEach(k=>pad.appendChild(mkKey(k)));
