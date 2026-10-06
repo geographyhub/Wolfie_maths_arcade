@@ -681,14 +681,23 @@ function comboMult(){
 function buildPad(){
   const pad=document.getElementById("pad");
   const sk=G.current.skill;
-  const special = sk==="fdp" ? "/" : sk==="neg" ? "−" : ".";
   const keys = ["1","2","3","4","5","6","7","8","9"];
   pad.innerHTML="";
   keys.forEach(k=>pad.appendChild(mkKey(k)));
-  pad.appendChild(mkKey(special,"wide"));
-  pad.appendChild(mkKey("0"));
-  pad.appendChild(mkKey("⌫","del"));
-  const go=mkKey("✓ Go","go"); go.style.gridColumn="span 3"; pad.appendChild(go);
+  if(sk==="fdp"){
+    /* Fractions & %: answers can be fractions (1/2) or decimals (0.25, 13.5), so both keys are needed */
+    pad.appendChild(mkKey("/","wide"));
+    pad.appendChild(mkKey("0"));
+    pad.appendChild(mkKey(".","wide"));
+    pad.appendChild(mkKey("⌫","del"));
+    const go=mkKey("✓ Go","go"); go.style.gridColumn="span 2"; pad.appendChild(go);
+  } else {
+    const special = sk==="neg" ? "−" : ".";
+    pad.appendChild(mkKey(special,"wide"));
+    pad.appendChild(mkKey("0"));
+    pad.appendChild(mkKey("⌫","del"));
+    const go=mkKey("✓ Go","go"); go.style.gridColumn="span 3"; pad.appendChild(go);
+  }
 }
 function mkKey(label,extra){
   const b=document.createElement("button");
